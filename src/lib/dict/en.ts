@@ -46,6 +46,8 @@ export const en = {
     setupSubmit: "Create manager account",
     setupDone: "This system already has a manager. Sign in instead.",
     passwordHint: "At least 8 characters.",
+    confirmSent: "Account created. Open the confirmation email we sent you, then sign in.",
+    unconfirmed: "This email is not confirmed yet. Open the confirmation email (check Junk too), then sign in.",
   },
   home: {
     title: "Overview",

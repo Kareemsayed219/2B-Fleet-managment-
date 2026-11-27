@@ -31,7 +31,8 @@ export default async function LoginPage({ searchParams }: PageProps<"/login">) {
         <form action={signIn} className="card flex flex-col gap-3">
           <h2 className="text-lg font-medium">{t.auth.title}</h2>
           {sp.failed ? <Notice kind="error">{t.auth.failed}</Notice> : null}
-          {sp.confirm ? <Notice kind="info">Check your email to confirm the account, then sign in.</Notice> : null}
+          {sp.confirm ? <Notice kind="info">{t.auth.confirmSent}</Notice> : null}
+          {sp.unconfirmed ? <Notice kind="error">{t.auth.unconfirmed}</Notice> : null}
           <label className="flex flex-col gap-1">
             <span className="text-sm text-muted">{t.auth.login}</span>
             <input className="input ltr" name="login" autoComplete="username" inputMode="text" required />

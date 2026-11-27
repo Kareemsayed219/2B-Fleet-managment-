@@ -28,7 +28,10 @@ export async function signIn(formData: FormData) {
   if (!login || !password) redirect("/login?failed=1");
   const supabase = await createClient();
   const { error } = await supabase.auth.signInWithPassword({ email: loginToEmail(login), password });
-  if (error) redirect("/login?failed=1");
+  if (error) {
+    // Supabase returns code "email_not_confirmed" when the sign-up link hasn't been clicked yet.
+    redirect(error.code === "email_not_confirmed" ? "/login?unconfirmed=1" : "/login?failed=1");
+  }
   redirect("/");
 }
 

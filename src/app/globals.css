@@ -1,0 +1,76 @@
+@import "tailwindcss";
+
+:root {
+  --background: #f6f7f9;
+  --surface: #ffffff;
+  --foreground: #1b1f24;
+  --muted: #5d6673;
+  --border: #d9dde3;
+  --accent: #0b6bcb;
+  --accent-fg: #ffffff;
+  --danger: #b42318;
+  --warn: #b54708;
+  --ok: #067647;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #0f1216;
+    --surface: #171b21;
+    --foreground: #e8eaed;
+    --muted: #9aa3ad;
+    --border: #2b313a;
+    --accent: #4c9cf0;
+    --accent-fg: #0b0e12;
+    --danger: #f97066;
+    --warn: #fdb022;
+    --ok: #47cd89;
+  }
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-surface: var(--surface);
+  --color-foreground: var(--foreground);
+  --color-muted: var(--muted);
+  --color-border: var(--border);
+  --color-accent: var(--accent);
+  --color-accent-fg: var(--accent-fg);
+  --color-danger: var(--danger);
+  --color-warn: var(--warn);
+  --color-ok: var(--ok);
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: system-ui, "Segoe UI", Tahoma, "Noto Sans Arabic", "Geeza Pro", Arial, sans-serif;
+}
+
+/* Plates, phones and numbers stay left-to-right inside Arabic text. */
+.ltr {
+  direction: ltr;
+  unicode-bidi: isolate;
+}
+
+.input {
+  @apply w-full rounded-md border border-border bg-surface px-3 py-2 text-base outline-none focus:border-accent;
+}
+.btn {
+  @apply inline-flex items-center justify-center rounded-md bg-accent px-4 py-2 font-medium text-accent-fg hover:opacity-90 disabled:opacity-50;
+}
+.btn-ghost {
+  @apply inline-flex items-center justify-center rounded-md border border-border px-3 py-1.5 text-sm hover:bg-background;
+}
+.card {
+  @apply rounded-lg border border-border bg-surface p-4;
+}
+.table {
+  @apply w-full text-sm;
+}
+.table th {
+  @apply border-b border-border px-2 py-2 text-start font-medium text-muted;
+}
+.table td {
+  @apply border-b border-border px-2 py-2 align-top;
+}

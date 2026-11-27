@@ -28,7 +28,7 @@ Access is enforced in the database (RLS policies in `supabase/migrations`), not 
 3. Open `/setup` once to create the first manager account. The first account created becomes the manager; every later sign-up is `pending`.
 4. In Supabase > Authentication > Providers > Email, turn off "Allow new users to sign up" after the manager exists. Admins create all other logins from the app.
 
-`SUPABASE_SERVICE_ROLE_KEY` is needed only for creating driver, runner and admin logins. Keep it server-side (a Vercel environment variable), never in the browser.
+Logins for drivers, runners and admins are created by the `create-login` Supabase Edge Function (`supabase/functions/create-login`). It reads the secret key from Supabase's own environment, so the web app never holds it and no service-role key is needed in Vercel. The function re-checks the caller: manager or admin for driver logins, manager only for admin logins.
 
 ## Logins
 

@@ -109,7 +109,6 @@ export const ar: typeof en = {
     createLogin: "إنشاء حساب دخول",
     loginPassword: "كلمة سر مبدئية",
     loginHelp: "السواق بيدخل برقم الموبايل ده وكلمة السر.",
-    serviceKeyMissing: "إنشاء الحسابات محتاج إعداد SUPABASE_SERVICE_ROLE_KEY على السيرفر.",
     kinds: { driver: "سواق", runner: "رانر" },
     statuses: { active: "نشط", inactive: "موقوف" },
   },

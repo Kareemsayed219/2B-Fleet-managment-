@@ -4,7 +4,7 @@ import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import { requireManager } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
-import { createAdminClient } from "@/lib/supabase/admin";
+import { createLogin } from "@/lib/supabase/create-login";
 import { str, withError } from "@/lib/form";
 import { loginToEmail, normalizePhone } from "@/lib/phone";
 import { getDict } from "@/lib/i18n";
@@ -35,17 +35,14 @@ export async function createStaffLogin(formData: FormData) {
   const password = str(formData, "password");
   const fullName = str(formData, "full_name") ?? "";
   if (!login || !password || password.length < 8) redirect(withError("/users", t.auth.passwordHint));
-  const admin = createAdminClient();
-  if (!admin) redirect(withError("/users", t.driver.serviceKeyMissing));
-  const { data, error } = await admin.auth.admin.createUser({
+  const err = await createLogin({
+    kind: "staff",
     email: loginToEmail(login),
+    full_name: fullName,
+    phone: login.includes("@") ? null : normalizePhone(login),
     password,
-    email_confirm: true,
-    user_metadata: { full_name: fullName, phone: login.includes("@") ? null : normalizePhone(login) },
   });
-  if (error || !data.user) redirect(withError("/users", error?.message ?? t.common.error));
-  const { error: pErr } = await admin.from("profiles").update({ role: "admin", active: true }).eq("id", data.user.id);
-  if (pErr) redirect(withError("/users", pErr.message));
+  if (err) redirect(withError("/users", err));
   revalidatePath("/users");
   redirect("/users?saved=1");
 }

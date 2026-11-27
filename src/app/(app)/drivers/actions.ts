@@ -4,9 +4,9 @@ import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import { requireStaff } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
-import { createAdminClient } from "@/lib/supabase/admin";
+import { createLogin } from "@/lib/supabase/create-login";
 import { friendlyDbError, str, withError } from "@/lib/form";
-import { normalizePhone, PHONE_EMAIL_DOMAIN } from "@/lib/phone";
+import { normalizePhone } from "@/lib/phone";
 import { parseSheet } from "@/lib/sheet";
 import { getDict } from "@/lib/i18n";
 
@@ -35,23 +35,12 @@ export async function saveDriver(formData: FormData) {
     ? await supabase.from("drivers").update(row).eq("id", id)
     : await supabase.from("drivers").insert(row);
   if (error) redirect(withError(back, friendlyDbError(error.message, t.assignment.overlap)));
-
-  // Keep the linked login's role and activation in step with the driver record.
-  if (id) {
-    const { data: d } = await supabase.from("drivers").select("profile_id").eq("id", id).maybeSingle();
-    const admin = createAdminClient();
-    if (d?.profile_id && admin) {
-      await admin
-        .from("profiles")
-        .update({ role: row.kind, active: row.status === "active", full_name: row.full_name, phone: row.phone })
-        .eq("id", d.profile_id);
-    }
-  }
+  // The linked login's role and activation follow the driver record via a database trigger.
   revalidatePath("/drivers");
   redirect("/drivers?saved=1");
 }
 
-/** Creates a phone+password login for a driver/runner and links it. Needs the service-role key. */
+/** Creates a phone+password login for a driver/runner and links it (via the create-login Edge Function). */
 export async function createDriverLogin(formData: FormData) {
   await requireStaff();
   const { t } = await getDict();
@@ -60,33 +49,8 @@ export async function createDriverLogin(formData: FormData) {
   if (!id) redirect("/drivers");
   const back = `/drivers/${id}`;
   if (!password || password.length < 8) redirect(withError(back, t.auth.passwordHint));
-  const admin = createAdminClient();
-  if (!admin) redirect(withError(back, t.driver.serviceKeyMissing));
-
-  const supabase = await createClient();
-  const { data: d } = await supabase
-    .from("drivers")
-    .select("id, full_name, phone, kind, status, profile_id")
-    .eq("id", id)
-    .maybeSingle();
-  if (!d) redirect("/drivers");
-  if (d.profile_id) redirect(back);
-
-  const { data: created, error } = await admin.auth.admin.createUser({
-    email: `${d.phone}@${PHONE_EMAIL_DOMAIN}`,
-    password,
-    email_confirm: true,
-    user_metadata: { full_name: d.full_name, phone: d.phone },
-  });
-  if (error || !created.user) redirect(withError(back, error?.message ?? t.common.error));
-
-  const uid = created.user.id;
-  const { error: pErr } = await admin
-    .from("profiles")
-    .update({ role: d.kind, active: d.status === "active" })
-    .eq("id", uid);
-  const { error: lErr } = await admin.from("drivers").update({ profile_id: uid }).eq("id", d.id);
-  if (pErr || lErr) redirect(withError(back, (pErr ?? lErr)!.message));
+  const err = await createLogin({ kind: "driver", driver_id: id, password });
+  if (err) redirect(withError(back, err));
   revalidatePath(back);
   redirect(`${back}?saved=1`);
 }

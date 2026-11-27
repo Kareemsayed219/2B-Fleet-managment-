@@ -15,7 +15,6 @@ export default async function UsersPage({ searchParams }: PageProps<"/users">) {
     .select("id, full_name, phone, role, active, created_at")
     .order("created_at");
   const users = (data ?? []) as { id: string; full_name: string; phone: string | null; role: Role; active: boolean }[];
-  const hasServiceKey = Boolean(process.env.SUPABASE_SERVICE_ROLE_KEY);
 
   return (
     <div className="flex flex-col gap-4">
@@ -62,16 +61,12 @@ export default async function UsersPage({ searchParams }: PageProps<"/users">) {
 
       <section className="card flex flex-col gap-3">
         <h2 className="font-medium">{t.users.newStaff}</h2>
-        {!hasServiceKey ? (
-          <Notice kind="info">{t.driver.serviceKeyMissing}</Notice>
-        ) : (
-          <form action={createStaffLogin} className="grid grid-cols-1 items-end gap-3 sm:grid-cols-4">
-            <Field label={t.auth.fullName} name="full_name" required />
-            <Field label={t.users.login} name="login" required ltr />
-            <Field label={t.auth.password} name="password" required ltr />
-            <button className="btn" type="submit">{t.common.add}</button>
-          </form>
-        )}
+        <form action={createStaffLogin} className="grid grid-cols-1 items-end gap-3 sm:grid-cols-4">
+          <Field label={t.auth.fullName} name="full_name" required />
+          <Field label={t.users.login} name="login" required ltr />
+          <Field label={t.auth.password} name="password" required ltr />
+          <button className="btn" type="submit">{t.common.add}</button>
+        </form>
       </section>
     </div>
   );

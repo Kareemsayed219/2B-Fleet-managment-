@@ -107,7 +107,6 @@ export const en = {
     createLogin: "Create login",
     loginPassword: "Starting password",
     loginHelp: "The driver signs in with this phone number and password.",
-    serviceKeyMissing: "Creating logins needs the SUPABASE_SERVICE_ROLE_KEY server setting.",
     kinds: { driver: "Driver", runner: "Runner" },
     statuses: { active: "Active", inactive: "Inactive" },
   },

@@ -23,7 +23,6 @@ export default async function EditDriverPage({ params, searchParams }: PageProps
       .limit(20),
   ]);
   if (!d) notFound();
-  const hasServiceKey = Boolean(process.env.SUPABASE_SERVICE_ROLE_KEY);
 
   return (
     <div className="flex flex-col gap-4">
@@ -38,8 +37,6 @@ export default async function EditDriverPage({ params, searchParams }: PageProps
           <p className="text-sm text-ok">
             {t.driver.hasLogin} · <span className="ltr">{d.phone}</span>
           </p>
-        ) : !hasServiceKey ? (
-          <Notice kind="info">{t.driver.serviceKeyMissing}</Notice>
         ) : (
           <form action={createDriverLogin} className="flex flex-wrap items-end gap-3">
             <input type="hidden" name="id" value={d.id} />
